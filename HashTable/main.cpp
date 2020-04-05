@@ -4,7 +4,20 @@
 #include <vector>
 #include <sstream>
 #include "LinearHashing.hpp"
+#include "CuckooHashing.hpp"
 using namespace std;
+
+string replaceAll(const string &src, string oldChars, string newChars)
+{
+    string s(src);
+    int pos = s.find(oldChars);
+    while (pos != string::npos)
+    {
+        s.replace(pos, oldChars.length(), newChars);
+        pos = s.find(oldChars);
+    }
+    return s;
+}
 
 vector<string> split(const string &s)
 {
@@ -18,7 +31,8 @@ vector<string> split(const string &s)
 
 void runTest(string filename, Hashing<uint32_t, uint32_t> *hashing)
 {
-    fstream file(filename);
+    ifstream file(filename);
+    ofstream output(replaceAll(filename, ".in", ".out"));
     string buf = "";
     int i = 0;
     while (getline(file, buf))
@@ -36,9 +50,10 @@ void runTest(string filename, Hashing<uint32_t, uint32_t> *hashing)
             uint32_t key = stol(v[1]);
             auto val = hashing->get(key);
             if (val == nullptr)
-                cout << "null" << endl;
+                output << "null"
+                       << "\n";
             else
-                cout << val->getVal() << endl;
+                output << val->getVal() << "\n";
         }
         else if (v[0] == "Del")
         {
@@ -50,9 +65,12 @@ void runTest(string filename, Hashing<uint32_t, uint32_t> *hashing)
             throw "Unknown operation " + v[0];
         }
     }
+    file.close();
+    output.close();
 }
 int main()
 {
-    LinearHashing<uint32_t, uint32_t> hashing;
+    // LinearHashing<uint32_t, uint32_t> hashing;
+    CuckooHashing<uint32_t, uint32_t> hashing;
     runTest("large.in", &hashing);
 }
