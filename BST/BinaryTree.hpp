@@ -11,13 +11,13 @@ template <typename T>
 class BinaryTree
 {
 protected:
-    const std::string nullNode = "null";
+    const std::string NIL = "null";
     TreeNode<T> *root;
 
 private:
     TreeNode<T> *innerBuild(const std::vector<std::string> &data, int idx)
     {
-        if (idx >= (int)data.size() || idx < 0 || data[idx] == nullNode)
+        if (idx >= (int)data.size() || idx < 0 || data[idx] == NIL)
             return nullptr;
         auto ptr = new TreeNode<T>(std::stoi(data[idx]));
         ptr->left = innerBuild(data, 2 * idx + 1);
@@ -51,8 +51,7 @@ public:
         while (!result.empty())
         {
             p = result.top(), result.pop();
-            if (p != nullptr)
-                delete p;
+            delete p;
         }
     }
 
