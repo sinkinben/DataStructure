@@ -1,9 +1,11 @@
 #include "TreeNode.hpp"
 #include <vector>
 #include <stack>
+#include <queue>
 #include <string>
 #include <sstream>
 #include <algorithm>
+#include <cassert>
 #ifndef BINARYTREE_H
 #define BINARYTREE_H
 
@@ -15,14 +17,33 @@ protected:
     TreeNode<T> *root;
 
 private:
-    TreeNode<T> *innerBuild(const std::vector<std::string> &data, int idx)
+    TreeNode<T> *generateNode(const std::string &s, TreeNode<T> *parent)
     {
-        if (idx >= (int)data.size() || idx < 0 || data[idx] == NIL)
+        return s == NIL ? nullptr : new TreeNode<T>(std::stoi(s), parent);
+    }
+    TreeNode<T> *innerBuild(const std::vector<std::string> &v)
+    {
+        if (v.size() == 0)
             return nullptr;
-        auto ptr = new TreeNode<T>(std::stoi(data[idx]));
-        ptr->left = innerBuild(data, 2 * idx + 1);
-        ptr->right = innerBuild(data, 2 * idx + 2);
-        return ptr;
+        int idx = 0, len = v.size();
+        TreeNode<T> *root = new TreeNode<T>(stoi(v[idx++]));
+        assert(root != nullptr);
+        std::queue<TreeNode<T> *> q;
+        q.push(root);
+        while (!q.empty())
+        {
+            auto node = q.front();
+            q.pop();
+            if (idx < len)
+                node->left = generateNode(v[idx++], node);
+            if (idx < len)
+                node->right = generateNode(v[idx++], node);
+            if (node->left != nullptr)
+                q.push(node->left);
+            if (node->right != nullptr)
+                q.push(node->right);
+        }
+        return root;
     }
 
 public:
@@ -51,9 +72,13 @@ public:
         while (!result.empty())
         {
             p = result.top(), result.pop();
-            delete p;
+            if (p != nullptr)
+                delete p;
         }
+        root = nullptr;
     }
+
+    TreeNode<T> *getRoot() { return this->root; }
 
     void buildTree(std::string str)
     {
@@ -75,7 +100,7 @@ public:
         while (ss >> buf)
             result.emplace_back(buf);
 
-        this->root = innerBuild(result, 0);
+        this->root = innerBuild(result);
     }
 
     std::vector<T> inorder()

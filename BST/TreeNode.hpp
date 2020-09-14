@@ -19,6 +19,13 @@ public:
         x = y = -1;
     }
 
+    TreeNode(T _val, TreeNode<T> *_parent)
+    {
+        val = _val;
+        parent = _parent;
+        left = right = nullptr;
+    }
+
     void setPosition(int _x, int _y)
     {
         x = _x, y = _y;

@@ -27,6 +27,11 @@ public:
         this->root = nullptr;
     }
 
+    BSTree(TreeNode<T> *root)
+    {
+        this->root = root;
+    }
+
     void selfCheck()
     {
         auto v = this->inorder();
@@ -37,6 +42,7 @@ public:
 
     // insert a new node into the BST, whose value is 'val'
     // each node in BST is unique
+    // return nullptr means 'val' is already in BST
     TreeNode<T> *insert(T val)
     {
         if (this->root == nullptr)
@@ -97,26 +103,26 @@ public:
     }
 
     // get max val in the BST
-    TreeNode<T> *maxval()
+    TreeNode<T> *maxval(TreeNode<T> *p)
     {
-        auto p = this->root;
         if (p == nullptr)
             return nullptr;
         while (p->right != nullptr)
             p = p->right;
         return p;
     }
+    TreeNode<T> *maxval() { return maxval(this->root); }
 
     // get min val in the BST
-    TreeNode<T> *minval()
+    TreeNode<T> *minval(TreeNode<T> *p)
     {
-        auto p = this->root;
         if (p == nullptr)
             return nullptr;
         while (p->left != nullptr)
             p = p->left;
         return p;
     }
+    TreeNode<T> *minval() { return minval(this->root); }
 
     // get the node's successor, whose value is 'val'
     TreeNode<T> *successor(T val)
@@ -126,6 +132,7 @@ public:
             return nullptr;
         if (x->right != nullptr)
             return minval(x->right);
+        
         auto y = x->parent;
         while (y != nullptr && y->right == x)
             x = y, y = y->parent;
@@ -140,6 +147,7 @@ public:
             return nullptr;
         if (x->left != nullptr)
             return maxval(x->left);
+        // if x->left is NIL then predecessor is its parent
         return x->parent;
     }
 };
