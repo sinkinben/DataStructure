@@ -5,6 +5,8 @@ template <typename T>
 class TreeNode
 {
 private:
+    // (x, y) is used to draw the binary tree in the console
+    // which is the node's coordinate on the screen
     int x, y;
 
 public:
@@ -25,11 +27,10 @@ public:
         parent = _parent;
         left = right = nullptr;
     }
-
-    void setPosition(int _x, int _y)
-    {
-        x = _x, y = _y;
-    }
+    int getx() { return x; }
+    int gety() { return y; }
+    void setx(int _x) { x = _x; }
+    void sety(int _y) { y = _y; }
 };
 
 #endif

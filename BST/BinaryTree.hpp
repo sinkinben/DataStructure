@@ -1,4 +1,5 @@
 #include "TreeNode.hpp"
+#include "Canvas.hpp"
 #include <vector>
 #include <stack>
 #include <queue>
@@ -44,6 +45,46 @@ private:
                 q.push(node->right);
         }
         return root;
+    }
+
+    void initCoordinate()
+    {
+        int x = 0;
+        initXCoordinate(this->root, x);
+        initYCoordinate();
+    }
+    void initXCoordinate(TreeNode<T> *currentNode, int &x)
+    {
+        if (currentNode == nullptr)
+            return;
+        initXCoordinate(currentNode->left, x);
+        currentNode->setx(x++);
+        initXCoordinate(currentNode->right, x);
+    }
+
+    void initYCoordinate()
+    {
+        if (this->root == nullptr)
+            return;
+        int level = 1;
+        std::queue<TreeNode<T> *> q;
+        q.push(root);
+        while (!q.empty())
+        {
+            std::queue<TreeNode<T> *> next;
+            while (!q.empty())
+            {
+                auto p = q.front();
+                q.pop();
+                p->sety(level);
+                if (p->left != nullptr)
+                    next.push(p->left);
+                if (p->right != nullptr)
+                    next.push(p->right);
+            }
+            q = next;
+            level++;
+        }
     }
 
 public:
@@ -166,6 +207,67 @@ public:
         }
         std::reverse(v.begin(), v.end());
         return v;
+    }
+
+    void drawWithSplash(int widthZoom = 3)
+    {
+        Canvas::resetBuffer();
+        initCoordinate();
+        std::queue<TreeNode<T> *> q;
+        q.push(root);
+        int x, y, val;
+        std::string sval;
+        while (!q.empty())
+        {
+            auto p = q.front();
+            q.pop();
+            bool l = (p->left != nullptr);
+            bool r = (p->right != nullptr);
+            x = p->getx(), y = p->gety(), val = p->val, sval = std::to_string(p->val);
+            Canvas::put(2 * y, widthZoom * x, sval);
+            if (l)
+            {
+                q.push(p->left);
+                Canvas::put(2 * y + 1, widthZoom * p->left->getx(), '_',
+                            widthZoom * (x - p->left->getx()) + sval.length() / 2);
+            }
+            if (r)
+            {
+                q.push(p->right);
+                Canvas::put(2 * y + 1, widthZoom * x, '_',
+                            widthZoom * (p->right->getx() - x) + std::to_string(p->right->val).length());
+            }
+            if (l || r)
+                Canvas::put(2 * y + 1, widthZoom * x + sval.length() / 2, "|");
+        }
+
+        Canvas::draw();
+    }
+
+    void drawWithUnderLine(int widthZoom = 1)
+    {
+        Canvas::resetBuffer();
+        std::queue<TreeNode<T> *> q;
+        q.push(root);
+        int x, y, val;
+        while (!q.empty())
+        {
+            auto p = q.front();
+            q.pop();
+            x = p->getx(), y = p->gety(), val = p->val;
+            Canvas::put(2 * y, widthZoom * x, std::to_string(val));
+            if (p->left != nullptr)
+            {
+                q.push(p->left);
+                Canvas::put(2 * y + 1, widthZoom * ((p->left->getx() + x) / 2), '/', 1);
+            }
+            if (p->right != nullptr)
+            {
+                q.push(p->right);
+                Canvas::put(2 * y + 1, widthZoom * ((x + p->right->getx()) / 2) + 1, '\\', 1);
+            }
+        }
+        Canvas::draw();
     }
 };
 #endif

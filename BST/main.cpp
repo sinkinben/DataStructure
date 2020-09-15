@@ -11,12 +11,15 @@ int main()
     std::string s3 = "[700,-1,800,-2,1,null,null,null,null,null,5,3,null,2,4]";
     std::string s4 = "[700,-1,800,-2,6,null,null,null,null,5,null,3,null,2,4]";
     tree.buildTree(s4);
-    print(tree.preorder());
-    print(tree.inorder());
-    print(tree.postorder());
+    // print(tree.preorder());
+    // print(tree.inorder());
+    // print(tree.postorder());
 
-    BSTree<int> bstree(tree.getRoot());
-    bstree.selfCheck();
-    auto p = bstree.successor(5);
-    std::cout << p->val << std::endl;
+    tree.drawWithSplash();
+    tree.drawWithUnderLine();
+
+    // BSTree<int> bstree(tree.getRoot());
+    // bstree.selfCheck();
+    // auto p = bstree.successor(5);
+    // std::cout << p->val << std::endl;
 }
