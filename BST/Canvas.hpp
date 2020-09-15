@@ -9,7 +9,6 @@ public:
     static const int HEIGHT = 15;
     static const int WIDTH = 80;
     static char buffer[HEIGHT][WIDTH + 1];
-    // std::vector<std::vector<char>> buffer;
 
     static void draw()
     {

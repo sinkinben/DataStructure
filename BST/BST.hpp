@@ -64,6 +64,23 @@ public:
         return val < y->val ? (y->left = node) : (y->right = node);
     }
 
+    // remove helper
+    // replace u with v
+    void transplant(TreeNode<T> *u, TreeNode<T> *v)
+    {
+        if (u == nullptr)
+            return;
+        // u is the root
+        if (u->parent == nullptr)
+            this->root = v;
+        else if (u == u->parent->left)
+            u->parent->left = v;
+        else
+            u->parent->right = v;
+        if (v != nullptr)
+            v->parent = u->parent;
+    }
+
     // remove node from the BST, whose value is 'val'
     bool remove(T val)
     {
@@ -72,8 +89,26 @@ public:
             return false;
         bool l = (node->left != nullptr);
         bool r = (node->right != nullptr);
-        // TODO
-        assert(0);
+        // case '!l' include (!l && !r) and (!l && r)
+        if (!l)
+            transplant(node, node->right);
+        else if (l && !r)
+            transplant(node, node->left);
+        else
+        {
+            auto y = minval(node->right);
+            if (y->parent != node)
+            {
+                transplant(y, y->right);
+                y->right = node->right;
+                y->right->parent = y;
+            }
+            transplant(node, y);
+            y->left = node->left;
+            y->left->parent = y;
+        }
+
+        delete node;
     }
 
     // update oldval to newval if oldval is in the BST, otherwise do nothing
@@ -124,7 +159,11 @@ public:
     }
     TreeNode<T> *minval() { return minval(this->root); }
 
-    // get the node's successor, whose value is 'val'
+    /* get the node's successor, whose value is 'val'
+     * if the right subtree of a node x in T is empty and x has a successor y, 
+     * then y is the lowest ancestor of x whose left child is also an ancestor of x. 
+     * (Recall that every node is its own ancestor.)
+     */
     TreeNode<T> *successor(T val)
     {
         auto x = search(val);
@@ -132,7 +171,6 @@ public:
             return nullptr;
         if (x->right != nullptr)
             return minval(x->right);
-        
         auto y = x->parent;
         while (y != nullptr && y->right == x)
             x = y, y = y->parent;
