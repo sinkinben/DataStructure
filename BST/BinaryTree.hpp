@@ -136,8 +136,8 @@ private:
             if (r)
             {
                 q.push(p->right);
-                Canvas::put(2 * y + 1, widthZoom * x, '_',
-                            widthZoom * (p->right->getx() - x) + std::to_string(p->right->val).length());
+                Canvas::put(2 * y + 1, widthZoom * x + sval.length() / 2, '_',
+                            widthZoom * (p->right->getx() - x) + std::to_string(p->right->val).length() - sval.length() / 2);
             }
             if (l || r)
                 Canvas::put(2 * y + 1, widthZoom * x + sval.length() / 2, "|");
@@ -282,6 +282,12 @@ public:
             drawWithSplash(widthZoom);
         else
             drawWithUnderline(widthZoom);
+    }
+
+    void destroy()
+    {
+        this->destroy(this->root);
+        this->root = nullptr;
     }
 };
 #endif

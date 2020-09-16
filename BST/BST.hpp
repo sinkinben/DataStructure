@@ -21,6 +21,23 @@ private:
             return innerSearch(p->right, val);
     }
 
+    // remove helper
+    // replace u with v
+    void transplant(TreeNode<T> *u, TreeNode<T> *v)
+    {
+        if (u == nullptr)
+            return;
+        // u is the root
+        if (u->parent == nullptr)
+            this->root = v;
+        else if (u == u->parent->left)
+            u->parent->left = v;
+        else
+            u->parent->right = v;
+        if (v != nullptr)
+            v->parent = u->parent;
+    }
+
 public:
     BSTree()
     {
@@ -64,23 +81,6 @@ public:
         return val < y->val ? (y->left = node) : (y->right = node);
     }
 
-    // remove helper
-    // replace u with v
-    void transplant(TreeNode<T> *u, TreeNode<T> *v)
-    {
-        if (u == nullptr)
-            return;
-        // u is the root
-        if (u->parent == nullptr)
-            this->root = v;
-        else if (u == u->parent->left)
-            u->parent->left = v;
-        else
-            u->parent->right = v;
-        if (v != nullptr)
-            v->parent = u->parent;
-    }
-
     // remove node from the BST, whose value is 'val'
     bool remove(T val)
     {
@@ -109,18 +109,15 @@ public:
         }
 
         delete node;
+        return true;
     }
 
     // update oldval to newval if oldval is in the BST, otherwise do nothing
-    bool update(T oldval, T newval)
+    TreeNode<T> *update(T oldval, T newval)
     {
-        auto p = search(oldval);
-        if (p != nullptr)
-        {
-            p->val = newval;
-            return true;
-        }
-        return false;
+        if (!remove(oldval))
+            return nullptr;
+        return insert(newval);
     }
 
     // search val by non-recursion
@@ -186,7 +183,10 @@ public:
         if (x->left != nullptr)
             return maxval(x->left);
         // if x->left is NIL then predecessor is its parent
-        return x->parent;
+        auto y = x->parent;
+        while (y != nullptr && y->left == x)
+            x = y, y = y->parent;
+        return y;
     }
 };
 #endif

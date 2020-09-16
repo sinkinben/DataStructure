@@ -6,7 +6,7 @@
 class Canvas
 {
 public:
-    static const int HEIGHT = 15;
+    static const int HEIGHT = 20;
     static const int WIDTH = 80;
     static char buffer[HEIGHT][WIDTH + 1];
 
