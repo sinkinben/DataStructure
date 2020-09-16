@@ -27,6 +27,7 @@ void test1()
         bstree.remove(t);
         bstree.selfCheck();
     }
+    assert(bstree.getRoot() == nullptr);
     cout << "Pass Test Case 1: Insertion and removal." << endl;
 }
 // test precedessor and successor
@@ -53,9 +54,47 @@ void test2()
     }
     cout << "Pass Test Case 2: Precedessor and successor." << endl;
 }
+// test generic and expandability
+void test3()
+{
+    class Node
+    {
+    private:
+        int key, val;
+
+    public:
+        Node() {}
+        Node(int k, int v) : key(k), val(v) {}
+        // These operators are necessary.
+        bool operator<(const Node &n) const { return key < n.key; }
+        bool operator>(const Node &n) const { return key > n.key; }
+        bool operator==(const Node &n) const { return key == n.key; }
+        bool operator!=(const Node &n) const { return key != n.key; }
+        Node &operator=(const Node &n)
+        {
+            key = n.key, val = n.val;
+            return *this;
+        }
+    };
+    BSTree<Node> tree;
+    srand(time(nullptr));
+    vector<int> pool;
+    int n = 10000;
+    while (n--)
+        pool.push_back(rand());
+    for (int x : pool)
+        tree.insert(Node(x, x));
+    tree.selfCheck();
+    for (int x : pool)
+    {
+        tree.remove(Node(x, x));
+        tree.selfCheck();
+    }
+    cout << "Pass Test Case 3: Generic Expandability." << endl;
+}
 int main()
 {
-    vector<function<void()>> tests = {test1, test2};
+    vector<function<void()>> tests = {test1, test2, test3};
     for (auto f : tests)
         f();
 }
