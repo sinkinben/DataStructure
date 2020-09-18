@@ -22,7 +22,7 @@ private:
     }
 
     // remove helper
-    // replace u with v
+    // replace subtree-u with subtree-v
     void transplant(TreeNode<T> *u, TreeNode<T> *v)
     {
         if (u == nullptr)

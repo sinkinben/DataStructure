@@ -15,6 +15,7 @@ class BinaryTree
 {
 protected:
     const std::string NIL = "null";
+    const std::string SEPARATOR = ",";
     TreeNode<T> *root;
 
 private:
@@ -187,6 +188,7 @@ public:
 
     TreeNode<T> *getRoot() { return this->root; }
 
+    // 用于通过序列化字符串创建树，节点值 val 需要使用 int 表示
     void buildTree(std::string str)
     {
         if (str.front() == '[' && str.back() == ']')
