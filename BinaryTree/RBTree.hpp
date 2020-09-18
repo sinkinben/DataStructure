@@ -2,6 +2,7 @@
 #include <string>
 #include <stack>
 #include <queue>
+#include <tuple>
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -84,6 +85,78 @@ private:
             p = result.top(), result.pop();
             if (p != NIL)
                 delete p;
+        }
+    }
+
+    void removeFixup(TreeNode<T> *x)
+    {
+        TreeNode<T> *w;
+        while (x != root && x->color == RBColor::Black)
+        {
+            if (x == x->parent->left)
+            {
+                w = x->parent->right;
+                if (w->color == RBColor::Red)
+                {
+                    w->color = RBColor::Black;
+                    x->parent->color = RBColor::Red;
+                    leftRotate(x->parent);
+                    w = x->parent->right;
+                }
+                if (w->left->color == RBColor::Black && w->right->color == RBColor::Black)
+                {
+                    w->color = RBColor::Red;
+                    x = x->parent;
+                }
+                else
+                {
+                    if (w->right->color == RBColor::Black)
+                    {
+                        w->left->color = RBColor::Black;
+                        w->color = RBColor::Red;
+                        rightRoate(w);
+                        w = x->parent->right;
+                    }
+                    w->color = x->parent->color;
+                    x->parent->color = RBColor::Black;
+                    w->right->color = RBColor::Black;
+                    leftRotate(x->parent);
+                    x = root;
+                }
+            }
+            else
+            {
+                // same as above the clause with 'right' and 'left' exchanged
+                w = x->parent->left;
+                if (w->color == RBColor::Red)
+                {
+                    w->color = RBColor::Black;
+                    x->parent->color = RBColor::Red;
+                    rightRoate(x->parent);
+                    w = x->parent->left;
+                }
+                if (w->right->color == RBColor::Black && w->left->color == RBColor::Black)
+                {
+                    w->color = RBColor::Red;
+                    x = x->parent;
+                }
+                else
+                {
+                    if (w->left->color == RBColor::Black)
+                    {
+                        w->right->color = RBColor::Black;
+                        w->color = RBColor::Red;
+                        leftRotate(w);
+                        w = x->parent->left;
+                    }
+                    w->color = x->parent->color;
+                    x->parent->color = RBColor::Black;
+                    x->left->color = RBColor::Black;
+                    rightRoate(x->parent);
+                    x = root;
+                }
+            }
+            x->color = RBColor::Black;
         }
     }
 
@@ -173,6 +246,19 @@ private:
         }
     }
 
+    void transplant(TreeNode<T> *u, TreeNode<T> *v)
+    {
+        // if (u == NIL)
+        //     return;
+        if (u->parent == NIL)
+            root = v;
+        else if (u == u->parent->left)
+            u->parent->left = v;
+        else
+            u->parent->right = v;
+        v->parent = u->parent;
+    }
+
 public:
     RBTree()
     {
@@ -193,8 +279,10 @@ public:
             y = x;
             if (val < x->val)
                 x = x->left;
-            else
+            else if (val > x->val)
                 x = x->right;
+            else
+                return NIL;
         }
         auto z = new TreeNode<T>(val, y, NIL, NIL, RBColor::Red);
         if (y == NIL)
@@ -204,7 +292,63 @@ public:
         else
             y->right = z;
         insertFixup(z);
+        return z;
     }
+
+    void remove(T val)
+    {
+        TreeNode<T> *x, *y, *z;
+        z = search(val);
+        y = z;
+        RBColor ycolor = y->color;
+        if (z->left == NIL)
+        {
+            x = z->right;
+            transplant(z, z->right);
+        }
+        else if (z->right == NIL)
+        {
+            x = z->left;
+            transplant(z, z->left);
+        }
+        else
+        {
+            y = minval(z->right);
+            ycolor = y->color;
+            x = y->right;
+            if (y->parent == z)
+                x->parent = y;
+            else
+            {
+                transplant(y, y->right);
+                y->right = z->right;
+                y->right->parent = y;
+            }
+            transplant(z, y);
+            y->left = z->left;
+            y->left->parent = y;
+            y->color = z->color;
+        }
+        if (ycolor == RBColor::Black)
+            removeFixup(x);
+    }
+
+    TreeNode<T> *search(T val)
+    {
+        auto p = root;
+        while (p != NIL && val != p->val)
+            p = (val < p->val) ? p->left : p->right;
+        return p;
+    }
+
+    TreeNode<T> *minval(TreeNode<T> *substree)
+    {
+        auto p = substree;
+        while (p->left != NIL)
+            p = p->left;
+        return p;
+    }
+    TreeNode<T> *minval() { return minval(root); }
 
     std::vector<T> inorder()
     {
@@ -232,6 +376,8 @@ public:
 
     TreeNode<T> *getRoot() { return root; }
 
+    TreeNode<T> *getNil() { return NIL; }
+
     void buildTree(std::string str)
     {
         if (str.front() == '[' & str.back() == ']')
@@ -252,7 +398,9 @@ public:
 
     void draw(int widthzoom = 3)
     {
-        typedef std::pair<int, int> Pair;
+        if (root == NIL)
+            return;
+        typedef std::tuple<int, int, int> Tuple;
         auto printNode = [](RBColor color, T val) {
             if (color == RBColor::Red)
                 std::cout << "\033[41m" << val << "\033[0m";
@@ -274,7 +422,8 @@ public:
         while (!q.empty())
         {
             std::queue<TreeNode<T> *> next;
-            std::vector<Pair> pairs;
+            std::vector<Tuple> pairs;
+
             int idx = 0;
             while (!q.empty())
             {
@@ -283,31 +432,53 @@ public:
                 color = p->color;
                 x = p->getx() * widthzoom, y = p->gety(), val = p->val, sval = std::to_string(val);
                 printChars(' ', x - idx), printNode(color, val);
-                idx += (x + sval.length());
+                idx = (x + sval.length());
                 if (p->left != NIL)
                 {
                     next.push(p->left);
-                    pairs.push_back(Pair(p->left->getx() * widthzoom, x + sval.length() / 2));
+                    pairs.push_back(Tuple(p->left->getx() * widthzoom, x + sval.length() / 2, false));
                 }
+                if (p->left != NIL || p->right != NIL)
+                    ;
                 if (p->right != NIL)
                 {
                     next.push(p->right);
-                    pairs.push_back(Pair(x + sval.length() / 2 + 1,
-                                         p->right->getx() * widthzoom + std::to_string(p->right->val).length()));
+                    pairs.push_back(Tuple(x + sval.length() / 2 + 1,
+                                          p->right->getx() * widthzoom + std::to_string(p->right->val).length(),
+                                          true));
                 }
             }
             std::cout << '\n';
-            idx = 0;
+
             if (!pairs.empty())
             {
                 std::string line;
                 for (auto &p : pairs)
                 {
-                    line.append(p.first - line.length(), ' ');
-                    line.append(p.second - p.first, '_');
-                    line.append(1, '|');
+                    int a = std::get<0>(p), b = std::get<1>(p);
+                    bool isright = std::get<2>(p);
+                    if (isright)
+                    {
+                        line.append(a - line.length(), ' ');
+                        if (line.back() != '|')
+                            line.append(1, '|');
+                        line.append(b - a, '_');
+                    }
+                    else
+                    {
+                        line.append(a - line.length(), ' ');
+                        line.append(b - a, '_');
+                        line.append(1, '|');
+                    }
+
+                    // line.append(a - line.length(), ' ');
+                    // if (isright && line.back() != '|')
+                    //     line.append(1, '|');
+                    // line.append(b - a, '_');
+                    // if (!isright)
+                    //     line.append(1, '|');
                 }
-                line.pop_back();
+                // line.pop_back();
                 std::cout << line << '\n';
             }
             q = next;
