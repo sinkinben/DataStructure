@@ -1,4 +1,4 @@
-#include "BST.hpp"
+#include "BSTree.hpp"
 #include <ctime>
 #include <functional>
 using namespace std;

@@ -1,6 +1,6 @@
 #include <iostream>
 #include <sstream>
-#include "BST.hpp"
+#include "BSTree.hpp"
 #include "BinaryTree.hpp"
 BSTree<int> tree;
 auto vprint = [](std::vector<int> v) {for (int x: v) std::cout<<x<<' '; std::cout<<std::endl; };
