@@ -10,10 +10,11 @@
 template <typename T>
 class RBTree
 {
-public:
+private:
     TreeNode<T> *const NIL = new TreeNode<T>();
     const std::string SEPARATOR = ",";
     TreeNode<T> *root;
+
     void leftRotate(TreeNode<T> *x)
     {
         auto y = x->right;
@@ -61,36 +62,29 @@ public:
         y->parent = x;
     }
 
-public:
-    RBTree()
+    void destroy(TreeNode<T> *subtree)
     {
-        NIL->color = RBColor::Black;
-        this->root = NIL;
-    }
-    ~RBTree()
-    {
-        delete NIL;
-    }
-
-    TreeNode<T> *insert(T val)
-    {
-        auto y = NIL, x = this->root;
-        while (x != NIL)
+        if (subtree == NIL)
+            return;
+        std::stack<TreeNode<T> *> result;
+        auto p = subtree;
+        std::stack<TreeNode<T> *> s;
+        s.push(p);
+        while (!s.empty())
         {
-            y = x;
-            if (val < x->val)
-                x = x->left;
-            else
-                x = x->right;
+            p = s.top(), s.pop();
+            result.push(p);
+            if (p->left != NIL)
+                s.push(p->left);
+            if (p->right != NIL)
+                s.push(p->right);
         }
-        auto z = new TreeNode<T>(val, y, NIL, NIL, RBColor::Red);
-        if (y == NIL)
-            this->root = z;
-        else if (val < y->val)
-            y->left = z;
-        else
-            y->right = z;
-        insertFixup(z);
+        while (!result.empty())
+        {
+            p = result.top(), result.pop();
+            if (p != NIL)
+                delete p;
+        }
     }
 
     void insertFixup(TreeNode<T> *z)
@@ -145,6 +139,73 @@ public:
         this->root->color = RBColor::Black;
     }
 
+    void initx(TreeNode<T> *p, int &x)
+    {
+        if (p == NIL)
+            return;
+        initx(p->left, x);
+        p->setx(x++);
+        initx(p->right, x);
+    }
+
+    void inity()
+    {
+        if (root == NIL)
+            return;
+        int level = 1;
+        std::queue<TreeNode<T> *> q;
+        q.push(root);
+        while (!q.empty())
+        {
+            std::queue<TreeNode<T> *> next;
+            while (!q.empty())
+            {
+                auto p = q.front();
+                q.pop();
+                p->sety(level);
+                if (p->left != NIL)
+                    next.push(p->left);
+                if (p->right != NIL)
+                    next.push(p->right);
+            }
+            q = next;
+            level++;
+        }
+    }
+
+public:
+    RBTree()
+    {
+        NIL->color = RBColor::Black;
+        this->root = NIL;
+    }
+    ~RBTree()
+    {
+        destroy(root);
+        delete NIL;
+    }
+
+    TreeNode<T> *insert(T val)
+    {
+        auto y = NIL, x = this->root;
+        while (x != NIL)
+        {
+            y = x;
+            if (val < x->val)
+                x = x->left;
+            else
+                x = x->right;
+        }
+        auto z = new TreeNode<T>(val, y, NIL, NIL, RBColor::Red);
+        if (y == NIL)
+            this->root = z;
+        else if (val < y->val)
+            y->left = z;
+        else
+            y->right = z;
+        insertFixup(z);
+    }
+
     std::vector<T> inorder()
     {
         std::vector<T> v;
@@ -187,40 +248,6 @@ public:
             list.emplace_back(str.substr(l));
         for (std::string &x : list)
             insert(std::stoi(x));
-    }
-
-    void initx(TreeNode<T> *p, int &x)
-    {
-        if (p == NIL)
-            return;
-        initx(p->left, x);
-        p->setx(x++);
-        initx(p->right, x);
-    }
-
-    void inity()
-    {
-        if (root == NIL)
-            return;
-        int level = 1;
-        std::queue<TreeNode<T> *> q;
-        q.push(root);
-        while (!q.empty())
-        {
-            std::queue<TreeNode<T> *> next;
-            while (!q.empty())
-            {
-                auto p = q.front();
-                q.pop();
-                p->sety(level);
-                if (p->left != NIL)
-                    next.push(p->left);
-                if (p->right != NIL)
-                    next.push(p->right);
-            }
-            q = next;
-            level++;
-        }
     }
 
     void draw(int widthzoom = 3)
