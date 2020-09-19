@@ -5,6 +5,14 @@ enum RBColor
     Red,
     Black
 };
+
+enum AVLFactor
+{
+    LH = 1,
+    EH = 0,
+    RH = -1
+};
+
 template <typename T>
 class TreeNode
 {
@@ -16,7 +24,10 @@ private:
 public:
     T val;
     TreeNode<T> *left, *right, *parent;
+    // 'color' variable is due to the implementation of the red and black tree.
     RBColor color;
+    // 'factor variable is due to the implementation of the AVLTree.
+    AVLFactor factor;
 
 public:
     TreeNode() { left = right = parent = this; }
@@ -39,6 +50,13 @@ public:
     {
         val = _val, parent = _parent, left = _left, right = _right;
         color = _color;
+    }
+
+    // This construct function is uedf for AVLTree.hpp
+    TreeNode(T _val, AVLFactor _factor)
+    {
+        val = _val, factor = _factor;
+        left = right = parent = nullptr;
     }
 
     int getx() { return x; }
