@@ -400,14 +400,19 @@ public:
     {
         if (root == NIL)
             return;
-        typedef std::tuple<int, int, int> Tuple;
+        
+        // print function with color
         auto printNode = [](RBColor color, T val) {
             if (color == RBColor::Red)
                 std::cout << "\033[41m" << val << "\033[0m";
             else if (color == RBColor::Black)
                 std::cout << "\033[40m" << val << "\033[0m";
         };
+        // print n chars
         auto printChars = [](char c, int n) {for(;n>0;n--) std::cout << c; };
+
+        typedef std::tuple<int, int, char> Tuple;
+
         int x = 0;
         initx(root, x);
         inity();
@@ -422,8 +427,7 @@ public:
         while (!q.empty())
         {
             std::queue<TreeNode<T> *> next;
-            std::vector<Tuple> pairs;
-
+            std::vector<Tuple> tuples;
             int idx = 0;
             while (!q.empty())
             {
@@ -436,51 +440,35 @@ public:
                 if (p->left != NIL)
                 {
                     next.push(p->left);
-                    pairs.push_back(Tuple(p->left->getx() * widthzoom, x + sval.length() / 2, false));
+                    int a = widthzoom * p->left->getx();
+                    int b = x + sval.length() / 2 - 1;
+                    tuples.push_back(Tuple(a, b, '_'));
                 }
                 if (p->left != NIL || p->right != NIL)
-                    ;
+                {
+                    int t = x + sval.length() / 2;
+                    tuples.push_back(Tuple(t, t, '|'));
+                }
                 if (p->right != NIL)
                 {
                     next.push(p->right);
-                    pairs.push_back(Tuple(x + sval.length() / 2 + 1,
-                                          p->right->getx() * widthzoom + std::to_string(p->right->val).length(),
-                                          true));
+                    int a = x + sval.length() / 2 + 1;
+                    int b = widthzoom * p->right->getx() + std::to_string(p->right->val).length() - 1;
+                    tuples.push_back(Tuple(a, b, '_'));
                 }
             }
             std::cout << '\n';
-
-            if (!pairs.empty())
+            idx = 0;
+            for (auto &t : tuples)
             {
-                std::string line;
-                for (auto &p : pairs)
-                {
-                    int a = std::get<0>(p), b = std::get<1>(p);
-                    bool isright = std::get<2>(p);
-                    if (isright)
-                    {
-                        line.append(a - line.length(), ' ');
-                        if (line.back() != '|')
-                            line.append(1, '|');
-                        line.append(b - a, '_');
-                    }
-                    else
-                    {
-                        line.append(a - line.length(), ' ');
-                        line.append(b - a, '_');
-                        line.append(1, '|');
-                    }
-
-                    // line.append(a - line.length(), ' ');
-                    // if (isright && line.back() != '|')
-                    //     line.append(1, '|');
-                    // line.append(b - a, '_');
-                    // if (!isright)
-                    //     line.append(1, '|');
-                }
-                // line.pop_back();
-                std::cout << line << '\n';
+                int a = std::get<0>(t), b = std::get<1>(t);
+                char c = std::get<2>(t);
+                for (; idx < a; idx++)
+                    printChars(' ', 1);
+                printChars(c, b - a + 1);
+                idx = b + 1;
             }
+            std::cout << '\n';
             q = next;
         }
     }

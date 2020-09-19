@@ -11,8 +11,8 @@ void dispatch(string &cmd)
     if (name == "i")
     {
         int val;
-        ss >> val;
-        tree.insert(val);
+        while (ss >> val)
+            tree.insert(val);
     }
     else if (name == "r")
     {
@@ -23,6 +23,10 @@ void dispatch(string &cmd)
     else if (name == "show")
     {
         tree.draw();
+    }
+    else if (name == "cls")
+    {
+        system("cls");
     }
     else
     {
