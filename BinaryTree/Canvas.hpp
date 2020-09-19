@@ -6,9 +6,17 @@
 class Canvas
 {
 public:
-    static const int HEIGHT = 10;
+    static const int HEIGHT = 20;
     static const int WIDTH = 80;
     static char buffer[HEIGHT][WIDTH + 1];
+
+    static bool isEmptyLine(const char str[WIDTH + 1])
+    {
+        int i = 0;
+        while (str[i] == ' ')
+            i++;
+        return i == WIDTH;
+    }
 
     static void draw()
     {
@@ -16,7 +24,8 @@ public:
         for (int i = 0; i < HEIGHT; i++)
         {
             buffer[i][WIDTH] = '\0';
-            std::cout << buffer[i] << std::endl;
+            if (!isEmptyLine(buffer[i]))
+                std::cout << buffer[i] << std::endl;
         }
         std::cout << std::endl;
     }
