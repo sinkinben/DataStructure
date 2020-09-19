@@ -1,6 +1,7 @@
 #include "TreeNode.hpp"
 #include <string>
 #include <stack>
+#include <cassert>
 #include <queue>
 #include <tuple>
 #include <iostream>
@@ -400,13 +401,15 @@ public:
     {
         if (root == NIL)
             return;
-        
+
         // print function with color
         auto printNode = [](RBColor color, T val) {
             if (color == RBColor::Red)
                 std::cout << "\033[41m" << val << "\033[0m";
             else if (color == RBColor::Black)
                 std::cout << "\033[40m" << val << "\033[0m";
+            else
+                assert(0);
         };
         // print n chars
         auto printChars = [](char c, int n) {for(;n>0;n--) std::cout << c; };

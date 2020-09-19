@@ -1,8 +1,9 @@
 #include "BSTree.hpp"
 #include <ctime>
 #include <functional>
+#include <iostream>
 using namespace std;
-auto vprint = [](vector<int> &v) {for(int x:v)cout<<x<<' '; cout<<endl; };
+auto vprint = [](vector<int> &v) {for(int x:v) cout<<x<<' '; cout<<endl; };
 // test insert and remove
 void test1()
 {

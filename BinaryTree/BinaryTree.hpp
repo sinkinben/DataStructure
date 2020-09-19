@@ -7,6 +7,7 @@
 #include <sstream>
 #include <algorithm>
 #include <cassert>
+#include <iostream>
 #ifndef BINARYTREE_H
 #define BINARYTREE_H
 
