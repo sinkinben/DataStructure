@@ -1,7 +1,7 @@
 #include "TreeNode.hpp"
-#include "Canvas.hpp"
 #include <vector>
 #include <stack>
+#include <tuple>
 #include <queue>
 #include <string>
 #include <sstream>
@@ -112,68 +112,6 @@ private:
         }
     }
 
-    void drawWithUnderline(int widthZoom = 3)
-    {
-        Canvas::resetBuffer();
-
-        std::queue<TreeNode<T> *> q;
-        q.push(root);
-        int x, y, val;
-        std::string sval;
-        while (!q.empty())
-        {
-            auto p = q.front();
-            q.pop();
-            bool l = (p->left != nullptr);
-            bool r = (p->right != nullptr);
-            x = p->getx(), y = p->gety(), val = p->val, sval = std::to_string(p->val);
-            Canvas::put(2 * y, widthZoom * x, sval);
-            if (l)
-            {
-                q.push(p->left);
-                Canvas::put(2 * y + 1, widthZoom * p->left->getx(), '_',
-                            widthZoom * (x - p->left->getx()) + sval.length() / 2);
-            }
-            if (r)
-            {
-                q.push(p->right);
-                Canvas::put(2 * y + 1, widthZoom * x + sval.length() / 2, '_',
-                            widthZoom * (p->right->getx() - x) + std::to_string(p->right->val).length() - sval.length() / 2);
-            }
-            if (l || r)
-                Canvas::put(2 * y + 1, widthZoom * x + sval.length() / 2, "|");
-        }
-
-        Canvas::draw();
-    }
-
-    void drawWithSplash(int widthZoom = 1)
-    {
-        Canvas::resetBuffer();
-
-        std::queue<TreeNode<T> *> q;
-        q.push(root);
-        int x, y, val;
-        while (!q.empty())
-        {
-            auto p = q.front();
-            q.pop();
-            x = p->getx(), y = p->gety(), val = p->val;
-            Canvas::put(2 * y, widthZoom * x, std::to_string(val));
-            if (p->left != nullptr)
-            {
-                q.push(p->left);
-                Canvas::put(2 * y + 1, widthZoom * ((p->left->getx() + x) / 2), '/', 1);
-            }
-            if (p->right != nullptr)
-            {
-                q.push(p->right);
-                Canvas::put(2 * y + 1, widthZoom * ((x + p->right->getx()) / 2) + 1, '\\', 1);
-            }
-        }
-        Canvas::draw();
-    }
-
 public:
     BinaryTree()
     {
@@ -277,13 +215,71 @@ public:
         return v;
     }
 
-    void draw(bool withSplash = false, int widthZoom = 3)
+    void draw(int widthZoom = 3)
     {
+        if (root == nullptr)
+            return;
+
         initCoordinate();
-        if (withSplash)
-            drawWithSplash(widthZoom);
-        else
-            drawWithUnderline(widthZoom);
+
+        auto printChars = [](char c, int n) { for (; n > 0; n--) std::cout << c; };
+
+        typedef std::tuple<int, int, char> Tuple;
+        std::queue<TreeNode<T> *> q;
+        std::string sval;
+        int x, y, val;
+
+        q.push(root);
+        while (!q.empty())
+        {
+            std::queue<TreeNode<T> *> next;
+            std::vector<Tuple> tuples;
+            int idx = 0;
+            while (!q.empty())
+            {
+                auto p = q.front();
+                q.pop();
+                bool l = (p->left != nullptr), r = (p->right != nullptr);
+                x = p->getx() * widthZoom, y = p->gety(), val = p->val, sval = std::to_string(val);
+                printChars(' ', x - idx), std::cout << val;
+                idx = x + sval.length();
+                if (l)
+                {
+                    next.push(p->left);
+                    int a = widthZoom * p->left->getx();
+                    int b = x + sval.length() / 2 - 1;
+                    tuples.emplace_back(Tuple(a, b, '_'));
+                }
+                if (l || r)
+                {
+                    int a = x + sval.length() / 2;
+                    tuples.emplace_back(Tuple(a, a, '|'));
+                }
+                if (r)
+                {
+                    next.push(p->right);
+                    int a = x + sval.length() / 2 + 1;
+                    int b = widthZoom * p->right->getx() + std::to_string(p->right->val).length() - 1;
+                    tuples.push_back(Tuple(a, b, '_'));
+                }
+            }
+            std::cout << '\n';
+            idx = 0;
+            if (!tuples.empty())
+            {
+                for (auto &t : tuples)
+                {
+                    int a = std::get<0>(t), b = std::get<1>(t);
+                    char c = std::get<2>(t);
+                    for (; idx < a; idx++)
+                        std::cout << ' ';
+                    printChars(c, b - a + 1);
+                    idx = b + 1;
+                }
+            }
+            std::cout << '\n';
+            q = next;
+        }
     }
 
     void destroy()
