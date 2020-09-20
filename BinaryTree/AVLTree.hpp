@@ -162,6 +162,11 @@ public:
 
     bool remove(T val)
     {
+        return remove(this->root, val);
+    }
+
+    bool remove(TreeNode<T> *&subtree, T val)
+    {
     }
 
     void leftBalance(TreeNode<T> *p)
