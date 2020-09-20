@@ -53,10 +53,11 @@ public:
     }
 
     // This construct function is uedf for AVLTree.hpp
-    TreeNode(T _val, AVLFactor _factor)
+    TreeNode(T _val, AVLFactor _factor, TreeNode<T> *_parent)
     {
         val = _val, factor = _factor;
-        left = right = parent = nullptr;
+        left = right = nullptr;
+        parent = _parent;
     }
 
     int getx() { return x; }

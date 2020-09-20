@@ -30,6 +30,8 @@ int main()
     AVLTree<int> avl;
     while (getline(cin, s))
     {
+        if (s == "q")
+            break;
         stringstream ss(s);
         int val;
         while (ss >> val)

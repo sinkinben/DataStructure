@@ -44,6 +44,7 @@ public:
 
     void leftRotate(TreeNode<T> *p)
     {
+        // std::cout << "00";
         if (p == nullptr)
             return;
         auto rc = p->right;
@@ -59,7 +60,10 @@ public:
         else if (p->parent->left == p)
             p->parent->left = rc;
         else
+        {
+            // std::cout << "11";
             p->parent->right = rc;
+        }
 
         rc->parent = p->parent;
 
@@ -70,14 +74,14 @@ public:
     bool insert(int val)
     {
         bool taller;
-        insert(this->root, val, taller);
+        insert(this->root, val, taller, nullptr);
         // std::cout << "111";
     }
-    bool insert(TreeNode<T> *&subtree, T val, bool &taller)
+    bool insert(TreeNode<T> *&subtree, T val, bool &taller, TreeNode<T> *parent)
     {
         if (subtree == nullptr)
         {
-            subtree = new TreeNode<T>(val, AVLFactor::EH);
+            subtree = new TreeNode<T>(val, AVLFactor::EH, parent);
             taller = true;
         }
         else if (val == subtree->val)
@@ -87,7 +91,7 @@ public:
         }
         else if (val < subtree->val)
         {
-            if (!insert(subtree->left, val, taller))
+            if (!insert(subtree->left, val, taller, subtree))
                 return false;
             if (taller)
             {
@@ -95,6 +99,7 @@ public:
                 {
                 case AVLFactor::LH:
                     leftBalance(subtree);
+                    taller = false;
                     break;
                 case AVLFactor::EH:
                     subtree->factor = AVLFactor::LH;
@@ -112,7 +117,7 @@ public:
         }
         else if (val > subtree->val)
         {
-            if (!insert(subtree->right, val, taller))
+            if (!insert(subtree->right, val, taller, subtree))
                 return false;
             if (taller)
             {
@@ -163,32 +168,32 @@ public:
     {
         // lc means left child
         // lcr means leftChild->right
-        TreeNode<T> *lc = p->left, *lcr = nullptr;
-        switch (lc->factor)
+        TreeNode<T> *l = p->left, *lr = nullptr;
+        switch (l->factor)
         {
         case AVLFactor::LH:
             p->factor = AVLFactor::EH;
-            lc->factor = AVLFactor::EH;
+            l->factor = AVLFactor::EH;
             rightRotate(p);
             break;
         case AVLFactor::RH:
             // here lcr must be not nullptr
-            lcr = lc->right;
-            switch (lcr->factor)
+            lr = l->right;
+            switch (lr->factor)
             {
             case AVLFactor::LH:
-                lc->factor = AVLFactor::EH;
-                lcr->factor = AVLFactor::EH;
+                l->factor = AVLFactor::EH;
+                lr->factor = AVLFactor::EH;
                 p->factor = AVLFactor::RH;
                 break;
             case AVLFactor::EH:
-                lc->factor = AVLFactor::EH;
-                lcr->factor = AVLFactor::EH;
+                l->factor = AVLFactor::EH;
+                lr->factor = AVLFactor::EH;
                 p->factor = AVLFactor::EH;
                 break;
             case AVLFactor::RH:
-                lc->factor = AVLFactor::LH;
-                lcr->factor = AVLFactor::EH;
+                l->factor = AVLFactor::LH;
+                lr->factor = AVLFactor::EH;
                 p->factor = AVLFactor::EH;
                 break;
             default:
@@ -206,35 +211,35 @@ public:
 
     void rightBalance(TreeNode<T> *p)
     {
-        TreeNode<T> *lc, *lcr;
-        lc = p->right;
-        switch (lc->factor)
+        TreeNode<T> *r, *rl;
+        r = p->right;
+        switch (r->factor)
         {
         case AVLFactor::RH:
-            lc->factor = p->factor = AVLFactor::EH;
+            r->factor = p->factor = AVLFactor::EH;
             leftRotate(p);
             break;
         case AVLFactor::LH:
-            lcr = lc->left;
-            switch (lcr->factor)
+            rl = r->left;
+            switch (rl->factor)
             {
             case AVLFactor::LH:
                 p->factor = AVLFactor::EH;
-                lc->factor = AVLFactor::RH;
+                r->factor = AVLFactor::RH;
                 break;
             case AVLFactor::EH:
-                p->factor = lc->factor = AVLFactor::EH;
+                p->factor = r->factor = AVLFactor::EH;
                 break;
             case AVLFactor::RH:
                 p->factor = AVLFactor::EH;
-                lc->factor = AVLFactor::LH;
+                r->factor = AVLFactor::LH;
                 break;
             default:
-                lcr->factor = AVLFactor::EH;
-                rightRotate(p->right);
-                leftRotate(p);
                 break;
             }
+            rl->factor = AVLFactor::EH;
+            rightRotate(p->right);
+            leftRotate(p);
             break;
         default:
             break;
