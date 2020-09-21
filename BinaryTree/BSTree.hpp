@@ -182,7 +182,6 @@ public:
             return nullptr;
         if (x->left != nullptr)
             return maxval(x->left);
-        // if x->left is NIL then predecessor is its parent
         auto y = x->parent;
         while (y != nullptr && y->left == x)
             x = y, y = y->parent;
