@@ -1,8 +1,9 @@
 #include "AVLTree.hpp"
 #include <sstream>
+#include <functional>
 using namespace std;
 AVLTree<int> tree;
-
+auto printv = [](vector<int> v) {for (int x: v) cout<<x<<' '; cout<<endl; };
 void dispatch(string &cmd)
 {
     stringstream ss(cmd);
@@ -19,6 +20,18 @@ void dispatch(string &cmd)
         int val;
         ss >> val;
         tree.remove(val);
+    }
+    else if (name == "preorder")
+    {
+        printv(tree.preorder());
+    }
+    else if (name == "inorder")
+    {
+        printv(tree.inorder());
+    }
+    else if (name == "postorder")
+    {
+        printv(tree.postorder());
     }
     else if (name == "show")
     {
