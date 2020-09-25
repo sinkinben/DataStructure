@@ -2,7 +2,7 @@
 #include <sstream>
 using namespace std;
 RBTree<int> tree;
-
+auto printv = [](vector<int> v) {for (int x:v) cout<<x<<' '; cout<<endl; };
 void dispatch(string &cmd)
 {
     stringstream ss(cmd);
@@ -19,6 +19,10 @@ void dispatch(string &cmd)
         int val;
         ss >> val;
         tree.remove(val);
+    }
+    else if (name == "inorder")
+    {
+        printv(tree.inorder());
     }
     else if (name == "show")
     {
